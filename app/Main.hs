@@ -22,7 +22,24 @@ main =
 convert2 :: Node -> Doc ann
 convert2 = \case
   NodeElement el -> case eltName el of
-    "input" -> undefined
+    "input" ->
+      hsep
+        -- (fmap value) is not strictly necessary, but
+        -- a useful pattern.
+        [ "fmap",
+          "value",
+          "inputElement",
+          "$",
+          "def",
+          "&",
+          "inputElementConfig_elementConfig",
+          ".",
+          "elementConfig_initialAttributes",
+          ".~",
+          if length (toList $ eltAttrs el) > 0
+            then "(" <> constructAttrs el <> ")"
+            else "mempty"
+        ]
     _ ->
       vsep
         [ hsep
