@@ -28,6 +28,7 @@ convert2 = \case
         -- a useful pattern.
         [ "fmap",
           "value",
+          "$",
           "inputElement",
           "$",
           "def",
