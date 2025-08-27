@@ -74,7 +74,9 @@ executable html2reflex
                     , prettyprinter >= 1.7.1 && < 1.8
                     , text >= 2.0.2 && < 2.1
                     , unordered-containers >= 0.2.20 && < 0.3
-
+                    , xml-conduit
+                    , html-conduit
+                    , containers
 
     -- Directories containing source files.
     hs-source-dirs:   app
