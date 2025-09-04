@@ -57,7 +57,7 @@ parseElement = \case
                 then
                   if elName == "svg"
                     then
-                      "constDyn ("
+                      "(constDyn "
                         <> "("
                         <> constructAttrs attrs
                         <> ")"
