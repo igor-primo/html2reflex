@@ -46,16 +46,21 @@ parseElement = \case
             else "mempty"
         ]
     ]
-  (Element elName attrs nodes) -> do
+  (Element (Name elName _ _) attrs nodes) -> do
     let nextEls = filterNodesGetElements nodes
     let nextCont = filterNodesGetContents nodes
     [ vsep
         [ hsep
-            [ if elName == "svg" then "elDynAttrNS Nothing" else "elAttr",
-              dquotes (pretty $ TS.unpack $ nameLocalName elName),
+            [ if isSvgType elName && not (hasXmlns attrs)
+                then "elDynAttrNS Nothing"
+                else
+                  if isSvgType elName && hasXmlns attrs
+                    then mconcat ["elDynAttrNS (Just \"", (getXmlns attrs), "\")"]
+                    else "elAttr",
+              dquotes (pretty $ TS.unpack elName),
               if length (toList attrs) > 0
                 then
-                  if elName == "svg"
+                  if isSvgType elName
                     then
                       "(constDyn "
                         <> "("
@@ -118,3 +123,25 @@ filterNodesGetContents nodes = flip mapMaybe (filter isContent nodes) $ \case
     isContent = \case
       NodeContent _ -> True
       _ -> False
+
+isSvgType :: TS.Text -> Bool
+isSvgType elName
+  | elName == "svg" = True
+  | elName == "rect" = True
+  | elName == "circle" = True
+  | elName == "ellipse" = True
+  | elName == "line" = True
+  | elName == "polyline" = True
+  | elName == "polygon" = True
+  | elName == "path" = True
+  | otherwise = False
+
+hasXmlns :: (Map Name TS.Text) -> Bool
+hasXmlns attrs = case lookup (Name "xmlns" Nothing Nothing) (toList attrs) of
+  Nothing -> False
+  Just _ -> True
+
+getXmlns :: (Map Name TS.Text) -> Doc ann
+getXmlns attrs = case lookup (Name "xmlns" Nothing Nothing) (toList attrs) of
+  Nothing -> pretty ("" :: TS.Text)
+  Just it -> pretty it
